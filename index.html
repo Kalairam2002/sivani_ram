@@ -61,6 +61,32 @@ body {
   100% { filter: hue-rotate(-10deg) brightness(0.9); }
 }
 
+/* ── MUSIC INDICATOR ── */
+#musicBtn {
+  position: fixed;
+  top: 16px; right: 16px;
+  z-index: 100;
+  background: #1976d230;
+  border: 1px solid #42a5f560;
+  border-radius: 50%;
+  width: 42px; height: 42px;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: all 0.3s;
+  backdrop-filter: blur(4px);
+}
+#musicBtn.visible { display: flex; }
+#musicBtn:active  { transform: scale(0.9); }
+#musicBtn.playing { animation: musicPulse 1s ease-in-out infinite; }
+@keyframes musicPulse {
+  0%,100% { box-shadow: 0 0 0 0 #1976d260; }
+  50%      { box-shadow: 0 0 0 8px #1976d200; }
+}
+
 /* ── BUTTON SCREEN ── */
 #btnScreen {
   position: relative;
@@ -165,12 +191,13 @@ body {
 /* ── HEART UNIVERSE ── */
 .universe {
   position: relative;
-  /* Responsive size: 90vw max 440px, keep square */
-  width: min(90vw, 90vh, 440px);
-  height: min(90vw, 90vh, 440px);
+  width: min(88vw, 88vh, 440px);
+  height: min(88vw, 88vh, 440px);
   display: flex;
   align-items: center;
   justify-content: center;
+  /* FIX: allow name text to overflow upward without clipping */
+  overflow: visible;
 }
 
 /* glowing orb */
@@ -187,7 +214,7 @@ body {
   50%      { transform:scale(1.2); opacity:1; }
 }
 
-/* rings — use % so they scale with .universe */
+/* rings */
 .ring {
   position: absolute;
   border-radius: 50%;
@@ -203,12 +230,11 @@ body {
   50%      { border-color:#42a5f590; box-shadow:0 0 15px #1976d230; }
 }
 
-/* orbit hearts — use CSS variable --r as % of universe size */
+/* orbit hearts */
 .oh {
   position: absolute;
   top: 50%; left: 50%;
   font-size: var(--fs, 1.4rem);
-  /* offset so emoji is centered on orbit path */
   margin: calc(var(--fs-px, 11px) * -1) 0 0 calc(var(--fs-px, 11px) * -1);
   animation: orbitHeart var(--dur) linear infinite;
   filter: drop-shadow(0 0 6px #42a5f5);
@@ -220,17 +246,21 @@ body {
   to   { transform: rotate(calc(var(--s) + 360deg)) translateX(var(--r)) rotate(calc(-1*var(--s) - 360deg)); }
 }
 
-/* name */
+/* ── NAME WRAP — FIX for clipping ── */
 .name-wrap {
   position: relative;
   z-index: 5;
   text-align: center;
+  /* Give enough top padding so Great Vibes ascenders are never clipped */
+  padding-top: 0.35em;
+  overflow: visible;
 }
 
 .name-text {
   font-family: 'Great Vibes', cursive;
-  font-size: clamp(3.5rem, 13vw, 6rem);
-  line-height: 1;
+  font-size: clamp(3.4rem, 12.5vw, 6rem);
+  /* Use 1.3 line-height so tall letters (S, i) have room */
+  line-height: 1.3;
   background: linear-gradient(135deg, #e3f2fd, #90caf9, #42a5f5, #1976d2, #bbdefb, #fff);
   background-size: 300% 300%;
   -webkit-background-clip: text;
@@ -238,6 +268,8 @@ body {
   background-clip: text;
   animation: nameGrad 4s ease infinite, nameFloat 3s ease-in-out infinite;
   filter: drop-shadow(0 0 20px #42a5f5cc) drop-shadow(0 0 50px #1976d280);
+  display: block;
+  overflow: visible;
 }
 @keyframes nameGrad {
   0%   { background-position:0% 50%; }
@@ -253,7 +285,7 @@ body {
   font-size: clamp(0.8rem, 3vw, 1.1rem);
   letter-spacing: clamp(2px, 1vw, 4px);
   animation: heartRowPulse 1.5s ease-in-out infinite;
-  margin-top: 4px;
+  margin-top: 2px;
   filter: drop-shadow(0 0 8px #42a5f5);
 }
 @keyframes heartRowPulse {
@@ -308,6 +340,34 @@ body {
   100% { transform: translateY(110vh) rotate(360deg) scale(1); opacity:0; }
 }
 
+/* ── SIVANI NAME RAIN ── */
+.name-rain {
+  position: fixed;
+  top: -120px;
+  left: var(--left);
+  font-family: 'Great Vibes', cursive;
+  font-size: var(--fs);
+  color: transparent;
+  background: linear-gradient(180deg, #e3f2fd, #90caf9, #42a5f5, #1976d2);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 0 8px #42a5f5cc) drop-shadow(0 0 18px #1976d280);
+  pointer-events: none;
+  z-index: 50;
+  opacity: 0;
+  animation: nameRainFall var(--dur) var(--ease) var(--delay) forwards;
+  white-space: nowrap;
+  line-height: 1;
+  will-change: transform, opacity;
+}
+@keyframes nameRainFall {
+  0%   { opacity:0; transform: translateY(0) rotate(var(--rot)) scale(0.6); }
+  8%   { opacity:1; }
+  75%  { opacity:0.9; transform: translateY(calc(100vh + 60px)) rotate(calc(var(--rot)*0.3)) scale(1.05); }
+  100% { opacity:0; transform: translateY(calc(112vh)) rotate(0deg) scale(0.9); }
+}
+
 /* reset btn */
 #resetBtn {
   display: none;
@@ -360,22 +420,16 @@ body {
 }
 
 /* ── MEDIA QUERIES ── */
-
-/* Small phones (≤380px) */
 @media (max-width: 380px) {
   .name-text { font-size: 3rem; }
   .subtitle  { letter-spacing: 2px; }
 }
-
-/* Very small height (landscape phones) */
 @media (max-height: 500px) {
-  .universe { width: min(60vw, 280px); height: min(60vw, 280px); }
+  .universe  { width: min(60vw, 280px); height: min(60vw, 280px); }
   .name-text { font-size: clamp(2.5rem, 8vw, 4rem); }
   .subtitle  { margin-top: 6px; font-size: 0.65rem; }
   #resetBtn  { margin-top: 8px; }
 }
-
-/* Tablets */
 @media (min-width: 600px) and (max-width: 1024px) {
   .universe { width: min(70vw, 440px); height: min(70vw, 440px); }
 }
@@ -385,6 +439,9 @@ body {
 
 <div class="stars" id="stars"></div>
 <div class="aurora"></div>
+
+<!-- Music toggle button -->
+<button id="musicBtn" onclick="toggleMusic()" title="Toggle Music">🎵</button>
 
 <!-- Button Screen -->
 <div id="btnScreen">
@@ -409,30 +466,154 @@ body {
       <div class="heart-row">💙 🩵 💙 🩵 💙</div>
     </div>
   </div>
-  <div class="subtitle">Forever In My Heart</div>
+  <div class="subtitle">You Always Forever In My Heart</div>
   <button id="resetBtn" onclick="resetAll()">↩ Once More</button>
 </div>
 
 <script>
-// ── Stars
+// ════════════════════════════════
+//  STARS
+// ════════════════════════════════
 const starsEl = document.getElementById('stars');
 for(let i=0;i<180;i++){
   const s=document.createElement('div');
   s.className='star';
-  const big = Math.random()>0.9;
+  const big=Math.random()>0.9;
   s.style.cssText=`left:${Math.random()*100}%;top:${Math.random()*100}%;--d:${1.5+Math.random()*4}s;animation-delay:${Math.random()*5}s;width:${big?3:1.5}px;height:${big?3:1.5}px;opacity:${0.1+Math.random()*0.5}`;
   starsEl.appendChild(s);
 }
 
-// ── Responsive orbit config based on universe size
+// ════════════════════════════════
+//  MUSIC — Web Audio API
+//  Romantic soft melody using
+//  oscillators (no file needed!)
+// ════════════════════════════════
+let audioCtx = null;
+let musicPlaying = false;
+let musicNodes = [];
+
+// Romantic melody notes (Hz) — a gentle love theme
+const melody = [
+  // Bar 1
+  523.25, 659.25, 783.99, 659.25,
+  // Bar 2
+  587.33, 698.46, 880.00, 698.46,
+  // Bar 3
+  523.25, 622.25, 783.99, 622.25,
+  // Bar 4
+  493.88, 587.33, 739.99, 587.33,
+  // Bar 5
+  440.00, 554.37, 659.25, 554.37,
+  // Bar 6
+  392.00, 523.25, 659.25, 523.25,
+  // Bar 7
+  349.23, 440.00, 587.33, 440.00,
+  // Bar 8 — resolve
+  392.00, 493.88, 659.25, 783.99,
+];
+
+// Harmony (lower, gentle pad)
+const harmony = [
+  261.63, 329.63, 392.00, 329.63,
+  293.66, 349.23, 440.00, 349.23,
+  261.63, 311.13, 392.00, 311.13,
+  246.94, 293.66, 369.99, 293.66,
+  220.00, 277.18, 329.63, 277.18,
+  196.00, 261.63, 329.63, 261.63,
+  174.61, 220.00, 293.66, 220.00,
+  196.00, 246.94, 329.63, 392.00,
+];
+
+function createAudioCtx(){
+  if(!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+}
+
+function playNote(freq, startTime, duration, vol=0.18, type='sine'){
+  if(!audioCtx) return;
+  const osc  = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+
+  osc.type = type;
+  osc.frequency.setValueAtTime(freq, startTime);
+
+  // soft fade in/out
+  gain.gain.setValueAtTime(0, startTime);
+  gain.gain.linearRampToValueAtTime(vol, startTime + duration*0.15);
+  gain.gain.setValueAtTime(vol, startTime + duration*0.7);
+  gain.gain.linearRampToValueAtTime(0, startTime + duration);
+
+  // light reverb via delay
+  const delay = audioCtx.createDelay(0.5);
+  delay.delayTime.value = 0.28;
+  const delayGain = audioCtx.createGain();
+  delayGain.gain.value = 0.25;
+
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
+  gain.connect(delay);
+  delay.connect(delayGain);
+  delayGain.connect(audioCtx.destination);
+
+  osc.start(startTime);
+  osc.stop(startTime + duration + 0.05);
+  musicNodes.push(osc);
+}
+
+function scheduleLoop(){
+  if(!musicPlaying || !audioCtx) return;
+  const now = audioCtx.currentTime;
+  const noteDur = 0.55;   // seconds per note
+  const totalDur = melody.length * noteDur;
+
+  melody.forEach((freq, i) => {
+    const t = now + i * noteDur;
+    playNote(freq,          t, noteDur, 0.16, 'sine');       // melody
+    playNote(harmony[i],    t, noteDur, 0.10, 'triangle');   // harmony
+    // Soft bass every 4 notes
+    if(i % 4 === 0){
+      playNote(harmony[i]/2, t, noteDur*3.8, 0.07, 'sine');
+    }
+  });
+
+  // Schedule next loop just before this one ends
+  setTimeout(scheduleLoop, (totalDur - 0.3) * 1000);
+}
+
+const audio = new Audio('birthday-song.mp3'); 
+audio.loop = true;
+audio.volume = 0.7;
+
+function startMusic(){
+  audio.play();
+  musicPlaying = true;
+  const btn = document.getElementById('musicBtn');
+  btn.textContent = '🔇';
+  btn.classList.add('playing');
+}
+
+function stopMusic(){
+  audio.pause();
+  audio.currentTime = 0;
+  musicPlaying = false;
+  const btn = document.getElementById('musicBtn');
+  btn.textContent = '🎵';
+  btn.classList.remove('playing');
+}
+
+function toggleMusic(){
+  musicPlaying ? stopMusic() : startMusic();
+}
+
+// ════════════════════════════════
+//  ORBITS
+// ════════════════════════════════
 function getUniverseSize(){
   return document.getElementById('universe').offsetWidth;
 }
 
 function buildOrbits(){
-  const u = document.getElementById('universe');
+  const u  = document.getElementById('universe');
   const sz = getUniverseSize();
-  // radii as fraction of universe size
   const orbits = [
     {rf:0.205, dur:'4s',  fsf:0.032, count:8,  hearts:['💙','🩵']},
     {rf:0.296, dur:'6s',  fsf:0.025, count:10, hearts:['💙','🩵','💙']},
@@ -440,28 +621,25 @@ function buildOrbits(){
     {rf:0.490, dur:'12s', fsf:0.017, count:14, hearts:['💙','🩵']},
   ];
   orbits.forEach(cfg => {
-    const r = Math.round(sz * cfg.rf);
+    const r  = Math.round(sz * cfg.rf);
     const fs = Math.max(10, Math.round(sz * cfg.fsf));
     for(let i=0;i<cfg.count;i++){
       const oh = document.createElement('div');
-      oh.className='oh';
-      const angle = (360/cfg.count)*i;
+      oh.className = 'oh';
       oh.textContent = cfg.hearts[i%cfg.hearts.length];
-      const fsPx = fs;
-      oh.style.cssText=`--r:${r}px;--dur:${cfg.dur};--s:${angle}deg;--fs:${fsPx}px;--fs-px:${fsPx/2}px`;
+      oh.style.cssText=`--r:${r}px;--dur:${cfg.dur};--s:${(360/cfg.count)*i}deg;--fs:${fs}px;--fs-px:${fs/2}px`;
       u.appendChild(oh);
     }
   });
 }
 
 function buildSparkles(){
-  const u = document.getElementById('universe');
+  const u  = document.getElementById('universe');
   const sz = getUniverseSize();
   for(let i=0;i<25;i++){
-    const sp=document.createElement('div');
-    sp.className='sparkle';
-    const a=Math.random()*360, r=(0.09+Math.random()*0.38)*sz;
-    const px=2+Math.random()*4;
+    const sp = document.createElement('div');
+    sp.className = 'sparkle';
+    const a=Math.random()*360, r=(0.09+Math.random()*0.38)*sz, px=2+Math.random()*4;
     sp.style.cssText=`left:calc(50% + ${Math.cos(a*Math.PI/180)*r}px);top:calc(50% + ${Math.sin(a*Math.PI/180)*r}px);--d:${1+Math.random()*3}s;animation-delay:${Math.random()*3}s;background:${Math.random()>0.5?'#90caf9':'#fff'};width:${px}px;height:${px}px`;
     u.appendChild(sp);
   }
@@ -470,96 +648,105 @@ function buildSparkles(){
 buildOrbits();
 buildSparkles();
 
-// Rebuild on resize
 let resizeTimer;
 window.addEventListener('resize', ()=>{
   clearTimeout(resizeTimer);
   resizeTimer = setTimeout(()=>{
-    const u = document.getElementById('universe');
-    // Remove old orbits & sparkles, keep rings, glow, name-wrap
     document.querySelectorAll('.oh,.sparkle').forEach(el=>el.remove());
-    buildOrbits();
-    buildSparkles();
+    buildOrbits(); buildSparkles();
   }, 300);
 });
 
-// ── Rain hearts
-let rainInterval=null;
+// ════════════════════════════════
+//  RAIN HEARTS
+// ════════════════════════════════
+let rainInterval = null;
 function startRain(){
-  const emojis=['💙','💙','💙','🩵','💙','🩵'];
+  const emojis = ['💙','💙','💙','🩵','💙','🩵'];
   function dropOne(){
-    const h=document.createElement('div');
-    h.className='rain-heart';
-    h.textContent=emojis[Math.floor(Math.random()*emojis.length)];
+    const h = document.createElement('div');
+    h.className = 'rain-heart';
+    h.textContent = emojis[Math.floor(Math.random()*emojis.length)];
     h.style.cssText=`left:${Math.random()*100}vw;--d:${3+Math.random()*5}s;--fs:${0.8+Math.random()*1.5}rem;animation-delay:0s`;
     document.body.appendChild(h);
-    setTimeout(()=>h.remove(),8000);
+    setTimeout(()=>h.remove(), 8000);
   }
   for(let i=0;i<10;i++) setTimeout(dropOne, i*200);
-  rainInterval=setInterval(()=>{
-    for(let i=0;i<3;i++) setTimeout(dropOne,i*150);
-  },600);
+  rainInterval = setInterval(()=>{
+    for(let i=0;i<3;i++) setTimeout(dropOne, i*150);
+  }, 600);
 }
 
-// ── Burst
-function burst(x,y,count=20){
+// ════════════════════════════════
+//  BURST & RIPPLE
+// ════════════════════════════════
+function burst(x, y, count=20){
   const isMobile = window.innerWidth < 600;
-  const actualCount = isMobile ? Math.floor(count*0.7) : count;
-  for(let i=0;i<actualCount;i++){
-    const b=document.createElement('div');
+  const n = isMobile ? Math.floor(count*0.7) : count;
+  for(let i=0;i<n;i++){
+    const b = document.createElement('div');
     b.className='burst';
-    b.textContent=Math.random()>0.4?'💙':'🩵';
-    b.style.fontSize=(0.9+Math.random()*1.5)+'rem';
+    b.textContent = Math.random()>0.4?'💙':'🩵';
+    b.style.fontSize = (0.9+Math.random()*1.5)+'rem';
     b.style.left=x+'px'; b.style.top=y+'px';
-    const angle=Math.random()*360;
-    const maxDist = isMobile ? 150 : 250;
-    const dist=60+Math.random()*maxDist;
-    b.style.setProperty('--tx',Math.cos(angle*Math.PI/180)*dist+'px');
-    b.style.setProperty('--ty',Math.sin(angle*Math.PI/180)*dist+'px');
-    b.style.setProperty('--rot',(Math.random()*360-180)+'deg');
-    b.style.setProperty('--d',(0.6+Math.random()*0.8)+'s');
+    const angle=Math.random()*360, dist=60+Math.random()*(isMobile?150:250);
+    b.style.setProperty('--tx', Math.cos(angle*Math.PI/180)*dist+'px');
+    b.style.setProperty('--ty', Math.sin(angle*Math.PI/180)*dist+'px');
+    b.style.setProperty('--rot', (Math.random()*360-180)+'deg');
+    b.style.setProperty('--d', (0.6+Math.random()*0.8)+'s');
     document.body.appendChild(b);
-    setTimeout(()=>b.remove(),1500);
+    setTimeout(()=>b.remove(), 1500);
   }
 }
 
-// ── Ripple
-function ripple(x,y){
-  const r=document.createElement('div');
+function ripple(x, y){
+  const r = document.createElement('div');
   r.className='ripple';
   r.style.left=x+'px'; r.style.top=y+'px';
   document.body.appendChild(r);
-  setTimeout(()=>r.remove(),900);
+  setTimeout(()=>r.remove(), 900);
 }
 
-// ── Reveal
+// ════════════════════════════════
+//  REVEAL
+// ════════════════════════════════
 function reveal(e){
-  const rect=e.currentTarget.getBoundingClientRect();
-  const cx=rect.left+rect.width/2, cy=rect.top+rect.height/2;
+  const rect = e.currentTarget.getBoundingClientRect();
+  const cx = rect.left+rect.width/2, cy = rect.top+rect.height/2;
 
-  burst(cx,cy,30);
-  ripple(cx,cy);
-
+  burst(cx, cy, 30);
+  ripple(cx, cy);
   [200,450,700].forEach(t=>{
     setTimeout(()=>{
       burst(cx+Math.random()*60-30, cy+Math.random()*60-30, 12);
       ripple(cx+Math.random()*40-20, cy+Math.random()*40-20);
-    },t);
+    }, t);
   });
 
-  document.getElementById('btnScreen').style.display='none';
-  const nd=document.getElementById('nameDisplay');
-  nd.classList.add('show');
-  setTimeout(()=>{ document.getElementById('resetBtn').style.display='inline-block'; },1800);
+  // ── FIX: fully reset nameDisplay before re-showing ──
+  const nd = document.getElementById('nameDisplay');
+  nd.classList.remove('show');  // strip old class
+  nd.style.display = '';        // clear inline display:none set by resetAll
+  void nd.offsetWidth;          // force reflow so CSS animation re-fires fresh
+  nd.classList.add('show');     // add class again = animation plays from start
+
+  document.getElementById('btnScreen').style.display = 'none';
+  document.getElementById('resetBtn').style.display  = 'none';
+  setTimeout(()=>{ document.getElementById('resetBtn').style.display='inline-block'; }, 1800);
+
   startRain();
 
-  // touch & click burst anywhere
+  // Show music button & auto-start music
+  const mb = document.getElementById('musicBtn');
+  mb.classList.add('visible');
+  setTimeout(()=>startMusic(), 400);
+
   document.addEventListener('click', clickBurst);
   document.addEventListener('touchstart', touchBurst, {passive:true});
 }
 
 function clickBurst(e){
-  if(e.target.id==='resetBtn') return;
+  if(['resetBtn','musicBtn'].includes(e.target.id)) return;
   burst(e.clientX, e.clientY, 10);
   ripple(e.clientX, e.clientY);
 }
@@ -567,19 +754,96 @@ function clickBurst(e){
 function touchBurst(e){
   const t = e.touches[0];
   if(!t) return;
+  if(['resetBtn','musicBtn'].includes(document.elementFromPoint(t.clientX,t.clientY)?.id)) return;
   burst(t.clientX, t.clientY, 10);
   ripple(t.clientX, t.clientY);
 }
 
+// ════════════════════════════════
+//  RESET
+// ════════════════════════════════
 function resetAll(){
+  // Stop all ongoing listeners & intervals
   document.removeEventListener('click', clickBurst);
   document.removeEventListener('touchstart', touchBurst);
   clearInterval(rainInterval);
-  const nd = document.getElementById('nameDisplay');
-  nd.classList.remove('show');
-  nd.style.display='none';
-  document.getElementById('resetBtn').style.display='none';
-  document.getElementById('btnScreen').style.display='flex';
+  rainInterval = null;
+
+  // ── Sivani name rain on "Once More" ──
+  startNameRain();
+
+  // Hide reset button immediately so user can't double-click
+  document.getElementById('resetBtn').style.display = 'none';
+
+  // After name rain show (4.2s), fully reset to button screen
+  setTimeout(() => {
+    stopNameRain();
+    stopMusic();
+
+    const mb = document.getElementById('musicBtn');
+    mb.classList.remove('visible');
+
+    // Fully clean nameDisplay — remove class AND inline style
+    const nd = document.getElementById('nameDisplay');
+    nd.classList.remove('show');
+    nd.style.display = 'none';
+
+    document.getElementById('btnScreen').style.display = 'flex';
+  }, 4200);
+}
+
+// ════════════════════════════════
+//  SIVANI NAME RAIN 💙
+// ════════════════════════════════
+let nameRainInterval = null;
+let nameRainActive   = false;
+
+function dropSivaniName(){
+  const el = document.createElement('div');
+  el.className = 'name-rain';
+  el.textContent = 'Sivani';
+
+  const sizes   = ['2rem','2.6rem','3.2rem','4rem','4.8rem','5.5rem','1.9rem'];
+  const easings = ['ease-in','ease-in-out','cubic-bezier(0.3,0,0.7,1)'];
+  const fs      = sizes[Math.floor(Math.random() * sizes.length)];
+  const dur     = (3.5 + Math.random() * 4).toFixed(2) + 's';
+  const delay   = (Math.random() * 0.4).toFixed(2) + 's';
+  const left    = (2 + Math.random() * 88).toFixed(1) + 'vw';
+  const rot     = (Math.random() * 28 - 14).toFixed(1) + 'deg';
+  const ease    = easings[Math.floor(Math.random() * easings.length)];
+
+  el.style.setProperty('--fs',    fs);
+  el.style.setProperty('--dur',   dur);
+  el.style.setProperty('--delay', delay);
+  el.style.setProperty('--left',  left);
+  el.style.setProperty('--rot',   rot);
+  el.style.setProperty('--ease',  ease);
+
+  document.body.appendChild(el);
+  const totalMs = (parseFloat(dur) + parseFloat(delay)) * 1000 + 400;
+  setTimeout(() => el.remove(), totalMs);
+}
+
+function startNameRain(){
+  if(nameRainActive) return;
+  nameRainActive = true;
+
+  // First big wave
+  const wave = window.innerWidth < 600 ? 8 : 14;
+  for(let i = 0; i < wave; i++) setTimeout(dropSivaniName, i * 110);
+
+  // Continuous stream
+  nameRainInterval = setInterval(() => {
+    const n = window.innerWidth < 600 ? 2 : 3;
+    for(let i = 0; i < n; i++) setTimeout(dropSivaniName, i * 200);
+  }, 650);
+}
+
+function stopNameRain(){
+  nameRainActive = false;
+  clearInterval(nameRainInterval);
+  nameRainInterval = null;
+  document.querySelectorAll('.name-rain').forEach(el => el.remove());
 }
 </script>
 </body>
