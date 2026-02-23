@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Sivani 💙</title>
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Pacifico&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+html, body {
+  width: 100%; height: 100%;
+  overflow: hidden;
+  touch-action: manipulation;
+}
+
+body {
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  cursor: default;
+  font-size: 16px;
+}
+
+/* ── STAR FIELD ── */
+.stars {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+.star {
+  position: absolute;
+  background: #fff;
+  border-radius: 50%;
+  animation: twinkle var(--d) ease-in-out infinite;
+}
+@keyframes twinkle {
+  0%,100% { opacity:0.1; transform:scale(1); }
+  50%      { opacity:1;   transform:scale(2); }
+}
+
+/* ── AURORA BG ── */
+.aurora {
+  position: fixed; inset: 0;
+  background:
+    radial-gradient(ellipse 80% 50% at 20% 50%, #0d47a180 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 80% 40%, #1565c060 0%, transparent 60%),
+    radial-gradient(ellipse 100% 60% at 50% 80%, #0a0a3080 0%, transparent 70%);
+  animation: aurora 8s ease-in-out infinite alternate;
+  pointer-events: none;
+  z-index: 0;
+}
+@keyframes aurora {
+  0%   { filter: hue-rotate(0deg) brightness(1); }
+  50%  { filter: hue-rotate(20deg) brightness(1.3); }
+  100% { filter: hue-rotate(-10deg) brightness(0.9); }
+}
+
+/* ── BUTTON SCREEN ── */
+#btnScreen {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(12px, 4vw, 24px);
+  padding: 20px;
+  width: 100%;
+}
+
+.btn-label {
+  font-family: 'Great Vibes', cursive;
+  font-size: clamp(1.3rem, 5vw, 2rem);
+  color: #90caf9;
+  opacity: 0.8;
+  animation: labelPulse 2s ease-in-out infinite;
+  letter-spacing: 2px;
+  text-align: center;
+}
+@keyframes labelPulse {
+  0%,100% { opacity:0.6; }
+  50%      { opacity:1; }
+}
+
+#showBtn {
+  position: relative;
+  padding: clamp(14px, 3.5vw, 20px) clamp(36px, 10vw, 60px);
+  font-family: 'Pacifico', cursive;
+  font-size: clamp(1.1rem, 4.5vw, 1.6rem);
+  color: #fff;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  letter-spacing: 2px;
+  z-index: 1;
+  white-space: nowrap;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btn-bg {
+  position: absolute;
+  inset: 0;
+  border-radius: 60px;
+  background: linear-gradient(135deg, #0d47a1, #1976d2, #42a5f5, #1565c0);
+  background-size: 300% 300%;
+  animation: gradShift 3s ease infinite;
+  box-shadow:
+    0 0 30px #1976d2aa,
+    0 0 60px #1976d260,
+    0 0 100px #1976d230,
+    inset 0 1px 0 #ffffff30;
+  z-index: -1;
+  transition: all 0.3s;
+}
+@keyframes gradShift {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+#showBtn:active .btn-bg { transform: scale(0.95); }
+
+.btn-shine {
+  position: absolute;
+  top: 0; left: -100%;
+  width: 60%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+  border-radius: 60px;
+  transform: skewX(-20deg);
+  animation: btnShine 3s infinite;
+  z-index: 1;
+  pointer-events: none;
+}
+@keyframes btnShine {
+  0%   { left: -100%; }
+  40%  { left: 160%; }
+  100% { left: 160%; }
+}
+
+/* ── MAIN DISPLAY ── */
+#nameDisplay {
+  display: none;
+  position: relative;
+  z-index: 10;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  width: 100%;
+  padding: 10px;
+}
+#nameDisplay.show {
+  display: flex;
+  animation: grandEntrance 1s cubic-bezier(0.34,1.56,0.64,1) forwards;
+}
+@keyframes grandEntrance {
+  from { opacity:0; transform: scale(0) rotate(-15deg); }
+  to   { opacity:1; transform: scale(1) rotate(0deg); }
+}
+
+/* ── HEART UNIVERSE ── */
+.universe {
+  position: relative;
+  /* Responsive size: 90vw max 440px, keep square */
+  width: min(90vw, 90vh, 440px);
+  height: min(90vw, 90vh, 440px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* glowing orb */
+.center-glow {
+  position: absolute;
+  width: 50%; height: 50%;
+  border-radius: 50%;
+  background: radial-gradient(circle, #1565c080 0%, #0d47a140 50%, transparent 70%);
+  animation: orbPulse 2.5s ease-in-out infinite;
+  z-index: 0;
+}
+@keyframes orbPulse {
+  0%,100% { transform:scale(1); opacity:0.7; }
+  50%      { transform:scale(1.2); opacity:1; }
+}
+
+/* rings — use % so they scale with .universe */
+.ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid #1976d240;
+  animation: ringPulse 3s ease-in-out infinite;
+}
+.ring:nth-child(1) { width:41%; height:41%; animation-delay:0s; }
+.ring:nth-child(2) { width:59%; height:59%; animation-delay:0.5s; }
+.ring:nth-child(3) { width:82%; height:82%; animation-delay:1s; }
+.ring:nth-child(4) { width:98%; height:98%; animation-delay:1.5s; }
+@keyframes ringPulse {
+  0%,100% { border-color:#1976d240; box-shadow:none; }
+  50%      { border-color:#42a5f590; box-shadow:0 0 15px #1976d230; }
+}
+
+/* orbit hearts — use CSS variable --r as % of universe size */
+.oh {
+  position: absolute;
+  top: 50%; left: 50%;
+  font-size: var(--fs, 1.4rem);
+  /* offset so emoji is centered on orbit path */
+  margin: calc(var(--fs-px, 11px) * -1) 0 0 calc(var(--fs-px, 11px) * -1);
+  animation: orbitHeart var(--dur) linear infinite;
+  filter: drop-shadow(0 0 6px #42a5f5);
+  z-index: 2;
+  line-height: 1;
+}
+@keyframes orbitHeart {
+  from { transform: rotate(var(--s)) translateX(var(--r)) rotate(calc(-1*var(--s))); }
+  to   { transform: rotate(calc(var(--s) + 360deg)) translateX(var(--r)) rotate(calc(-1*var(--s) - 360deg)); }
+}
+
+/* name */
+.name-wrap {
+  position: relative;
+  z-index: 5;
+  text-align: center;
+}
+
+.name-text {
+  font-family: 'Great Vibes', cursive;
+  font-size: clamp(3.5rem, 13vw, 6rem);
+  line-height: 1;
+  background: linear-gradient(135deg, #e3f2fd, #90caf9, #42a5f5, #1976d2, #bbdefb, #fff);
+  background-size: 300% 300%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: nameGrad 4s ease infinite, nameFloat 3s ease-in-out infinite;
+  filter: drop-shadow(0 0 20px #42a5f5cc) drop-shadow(0 0 50px #1976d280);
+}
+@keyframes nameGrad {
+  0%   { background-position:0% 50%; }
+  50%  { background-position:100% 50%; }
+  100% { background-position:0% 50%; }
+}
+@keyframes nameFloat {
+  0%,100% { transform: translateY(0) scale(1); }
+  50%      { transform: translateY(-8px) scale(1.03); }
+}
+
+.heart-row {
+  font-size: clamp(0.8rem, 3vw, 1.1rem);
+  letter-spacing: clamp(2px, 1vw, 4px);
+  animation: heartRowPulse 1.5s ease-in-out infinite;
+  margin-top: 4px;
+  filter: drop-shadow(0 0 8px #42a5f5);
+}
+@keyframes heartRowPulse {
+  0%,100% { transform:scale(1); }
+  50%      { transform:scale(1.15); }
+}
+
+/* subtitle */
+.subtitle {
+  font-family: 'Playfair Display', serif;
+  color: #90caf9;
+  font-size: clamp(0.65rem, 2.8vw, 1.1rem);
+  letter-spacing: clamp(3px, 1.5vw, 5px);
+  opacity: 0;
+  animation: fadeSlideUp 1s 1s ease forwards;
+  text-transform: uppercase;
+  margin-top: clamp(10px, 3vw, 16px);
+  text-align: center;
+}
+@keyframes fadeSlideUp {
+  from { opacity:0; transform:translateY(20px); }
+  to   { opacity:0.9; transform:translateY(0); }
+}
+
+/* sparkle */
+.sparkle {
+  position: absolute;
+  border-radius: 50%;
+  background: #90caf9;
+  animation: sparkleAnim var(--d) ease-in-out infinite;
+  z-index: 3;
+}
+@keyframes sparkleAnim {
+  0%,100% { opacity:0; transform:scale(0); }
+  50%      { opacity:1; transform:scale(1); }
+}
+
+/* rain hearts */
+.rain-heart {
+  position: fixed;
+  top: -50px;
+  font-size: var(--fs);
+  animation: rainFall var(--d) linear infinite;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.7;
+}
+@keyframes rainFall {
+  0%   { transform: translateY(-50px) rotate(0deg) scale(0.6); opacity:0; }
+  10%  { opacity:0.8; }
+  90%  { opacity:0.5; }
+  100% { transform: translateY(110vh) rotate(360deg) scale(1); opacity:0; }
+}
+
+/* reset btn */
+#resetBtn {
+  display: none;
+  margin-top: clamp(16px, 4vw, 30px);
+  padding: clamp(9px, 2.5vw, 12px) clamp(22px, 7vw, 35px);
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(0.75rem, 3vw, 1rem);
+  letter-spacing: 3px;
+  background: transparent;
+  border: 1px solid #42a5f560;
+  color: #90caf9;
+  border-radius: 40px;
+  cursor: pointer;
+  transition: all 0.4s;
+  text-transform: uppercase;
+  -webkit-tap-highlight-color: transparent;
+}
+#resetBtn:active {
+  background: #1976d220;
+  border-color: #42a5f5;
+  transform: scale(0.96);
+}
+
+/* burst hearts */
+.burst {
+  position: fixed;
+  pointer-events: none;
+  z-index: 99;
+  animation: burstAnim var(--d) ease-out forwards;
+  line-height: 1;
+}
+@keyframes burstAnim {
+  0%   { opacity:1; transform:translate(0,0) scale(0.3) rotate(0deg); }
+  100% { opacity:0; transform:translate(var(--tx),var(--ty)) scale(1.8) rotate(var(--rot)); }
+}
+
+/* ripple */
+.ripple {
+  position: fixed;
+  border-radius: 50%;
+  background: #1976d240;
+  animation: rippleOut 0.8s ease-out forwards;
+  pointer-events: none;
+  z-index: 99;
+  transform: translate(-50%, -50%);
+}
+@keyframes rippleOut {
+  from { width:0; height:0; opacity:1; }
+  to   { width:200px; height:200px; opacity:0; }
+}
+
+/* ── MEDIA QUERIES ── */
+
+/* Small phones (≤380px) */
+@media (max-width: 380px) {
+  .name-text { font-size: 3rem; }
+  .subtitle  { letter-spacing: 2px; }
+}
+
+/* Very small height (landscape phones) */
+@media (max-height: 500px) {
+  .universe { width: min(60vw, 280px); height: min(60vw, 280px); }
+  .name-text { font-size: clamp(2.5rem, 8vw, 4rem); }
+  .subtitle  { margin-top: 6px; font-size: 0.65rem; }
+  #resetBtn  { margin-top: 8px; }
+}
+
+/* Tablets */
+@media (min-width: 600px) and (max-width: 1024px) {
+  .universe { width: min(70vw, 440px); height: min(70vw, 440px); }
+}
+</style>
+</head>
+<body>
+
+<div class="stars" id="stars"></div>
+<div class="aurora"></div>
+
+<!-- Button Screen -->
+<div id="btnScreen">
+  <div class="btn-label">✦ A Special Surprise Awaits ✦</div>
+  <button id="showBtn" onclick="reveal(event)">
+    <div class="btn-bg"></div>
+    <div class="btn-shine"></div>
+    💙 Tap to Reveal 💙
+  </button>
+</div>
+
+<!-- Name Display -->
+<div id="nameDisplay">
+  <div class="universe" id="universe">
+    <div class="ring"></div>
+    <div class="ring"></div>
+    <div class="ring"></div>
+    <div class="ring"></div>
+    <div class="center-glow"></div>
+    <div class="name-wrap">
+      <div class="name-text">Sivani</div>
+      <div class="heart-row">💙 🩵 💙 🩵 💙</div>
+    </div>
+  </div>
+  <div class="subtitle">Forever In My Heart</div>
+  <button id="resetBtn" onclick="resetAll()">↩ Once More</button>
+</div>
+
+<script>
+// ── Stars
+const starsEl = document.getElementById('stars');
+for(let i=0;i<180;i++){
+  const s=document.createElement('div');
+  s.className='star';
+  const big = Math.random()>0.9;
+  s.style.cssText=`left:${Math.random()*100}%;top:${Math.random()*100}%;--d:${1.5+Math.random()*4}s;animation-delay:${Math.random()*5}s;width:${big?3:1.5}px;height:${big?3:1.5}px;opacity:${0.1+Math.random()*0.5}`;
+  starsEl.appendChild(s);
+}
+
+// ── Responsive orbit config based on universe size
+function getUniverseSize(){
+  return document.getElementById('universe').offsetWidth;
+}
+
+function buildOrbits(){
+  const u = document.getElementById('universe');
+  const sz = getUniverseSize();
+  // radii as fraction of universe size
+  const orbits = [
+    {rf:0.205, dur:'4s',  fsf:0.032, count:8,  hearts:['💙','🩵']},
+    {rf:0.296, dur:'6s',  fsf:0.025, count:10, hearts:['💙','🩵','💙']},
+    {rf:0.420, dur:'9s',  fsf:0.020, count:12, hearts:['🩵','💙']},
+    {rf:0.490, dur:'12s', fsf:0.017, count:14, hearts:['💙','🩵']},
+  ];
+  orbits.forEach(cfg => {
+    const r = Math.round(sz * cfg.rf);
+    const fs = Math.max(10, Math.round(sz * cfg.fsf));
+    for(let i=0;i<cfg.count;i++){
+      const oh = document.createElement('div');
+      oh.className='oh';
+      const angle = (360/cfg.count)*i;
+      oh.textContent = cfg.hearts[i%cfg.hearts.length];
+      const fsPx = fs;
+      oh.style.cssText=`--r:${r}px;--dur:${cfg.dur};--s:${angle}deg;--fs:${fsPx}px;--fs-px:${fsPx/2}px`;
+      u.appendChild(oh);
+    }
+  });
+}
+
+function buildSparkles(){
+  const u = document.getElementById('universe');
+  const sz = getUniverseSize();
+  for(let i=0;i<25;i++){
+    const sp=document.createElement('div');
+    sp.className='sparkle';
+    const a=Math.random()*360, r=(0.09+Math.random()*0.38)*sz;
+    const px=2+Math.random()*4;
+    sp.style.cssText=`left:calc(50% + ${Math.cos(a*Math.PI/180)*r}px);top:calc(50% + ${Math.sin(a*Math.PI/180)*r}px);--d:${1+Math.random()*3}s;animation-delay:${Math.random()*3}s;background:${Math.random()>0.5?'#90caf9':'#fff'};width:${px}px;height:${px}px`;
+    u.appendChild(sp);
+  }
+}
+
+buildOrbits();
+buildSparkles();
+
+// Rebuild on resize
+let resizeTimer;
+window.addEventListener('resize', ()=>{
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(()=>{
+    const u = document.getElementById('universe');
+    // Remove old orbits & sparkles, keep rings, glow, name-wrap
+    document.querySelectorAll('.oh,.sparkle').forEach(el=>el.remove());
+    buildOrbits();
+    buildSparkles();
+  }, 300);
+});
+
+// ── Rain hearts
+let rainInterval=null;
+function startRain(){
+  const emojis=['💙','💙','💙','🩵','💙','🩵'];
+  function dropOne(){
+    const h=document.createElement('div');
+    h.className='rain-heart';
+    h.textContent=emojis[Math.floor(Math.random()*emojis.length)];
+    h.style.cssText=`left:${Math.random()*100}vw;--d:${3+Math.random()*5}s;--fs:${0.8+Math.random()*1.5}rem;animation-delay:0s`;
+    document.body.appendChild(h);
+    setTimeout(()=>h.remove(),8000);
+  }
+  for(let i=0;i<10;i++) setTimeout(dropOne, i*200);
+  rainInterval=setInterval(()=>{
+    for(let i=0;i<3;i++) setTimeout(dropOne,i*150);
+  },600);
+}
+
+// ── Burst
+function burst(x,y,count=20){
+  const isMobile = window.innerWidth < 600;
+  const actualCount = isMobile ? Math.floor(count*0.7) : count;
+  for(let i=0;i<actualCount;i++){
+    const b=document.createElement('div');
+    b.className='burst';
+    b.textContent=Math.random()>0.4?'💙':'🩵';
+    b.style.fontSize=(0.9+Math.random()*1.5)+'rem';
+    b.style.left=x+'px'; b.style.top=y+'px';
+    const angle=Math.random()*360;
+    const maxDist = isMobile ? 150 : 250;
+    const dist=60+Math.random()*maxDist;
+    b.style.setProperty('--tx',Math.cos(angle*Math.PI/180)*dist+'px');
+    b.style.setProperty('--ty',Math.sin(angle*Math.PI/180)*dist+'px');
+    b.style.setProperty('--rot',(Math.random()*360-180)+'deg');
+    b.style.setProperty('--d',(0.6+Math.random()*0.8)+'s');
+    document.body.appendChild(b);
+    setTimeout(()=>b.remove(),1500);
+  }
+}
+
+// ── Ripple
+function ripple(x,y){
+  const r=document.createElement('div');
+  r.className='ripple';
+  r.style.left=x+'px'; r.style.top=y+'px';
+  document.body.appendChild(r);
+  setTimeout(()=>r.remove(),900);
+}
+
+// ── Reveal
+function reveal(e){
+  const rect=e.currentTarget.getBoundingClientRect();
+  const cx=rect.left+rect.width/2, cy=rect.top+rect.height/2;
+
+  burst(cx,cy,30);
+  ripple(cx,cy);
+
+  [200,450,700].forEach(t=>{
+    setTimeout(()=>{
+      burst(cx+Math.random()*60-30, cy+Math.random()*60-30, 12);
+      ripple(cx+Math.random()*40-20, cy+Math.random()*40-20);
+    },t);
+  });
+
+  document.getElementById('btnScreen').style.display='none';
+  const nd=document.getElementById('nameDisplay');
+  nd.classList.add('show');
+  setTimeout(()=>{ document.getElementById('resetBtn').style.display='inline-block'; },1800);
+  startRain();
+
+  // touch & click burst anywhere
+  document.addEventListener('click', clickBurst);
+  document.addEventListener('touchstart', touchBurst, {passive:true});
+}
+
+function clickBurst(e){
+  if(e.target.id==='resetBtn') return;
+  burst(e.clientX, e.clientY, 10);
+  ripple(e.clientX, e.clientY);
+}
+
+function touchBurst(e){
+  const t = e.touches[0];
+  if(!t) return;
+  burst(t.clientX, t.clientY, 10);
+  ripple(t.clientX, t.clientY);
+}
+
+function resetAll(){
+  document.removeEventListener('click', clickBurst);
+  document.removeEventListener('touchstart', touchBurst);
+  clearInterval(rainInterval);
+  const nd = document.getElementById('nameDisplay');
+  nd.classList.remove('show');
+  nd.style.display='none';
+  document.getElementById('resetBtn').style.display='none';
+  document.getElementById('btnScreen').style.display='flex';
+}
+</script>
+</body>
+</html>
